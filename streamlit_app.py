@@ -557,7 +557,7 @@ if uploaded:
             display_mask = mask
              
         # UPDATED: Use higher target height for better visibility
-        target_height = 550  # Increased from 400
+        target_height = 850  # Increased from 400
         
         # Calculate aspect ratio and resize
         mask_h, mask_w = display_mask.shape[:2]
