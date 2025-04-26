@@ -79,7 +79,7 @@ st.markdown(f"""
 if LOGO_PATH.exists():
     st.markdown(f"""
     <div style="background-color:{COL['highlight']}; padding:20px; border-radius:10px; text-align:center; margin-bottom:20px;">
-        <img src="data:image/png;base64,{base64.b64encode(open(str(LOGO_PATH), 'rb').read()).decode()}" class="logo" style="width:600px; margin:0 auto; display:block;">
+        <img src="data:image/png;base64,{base64.b64encode(open(str(LOGO_PATH), 'rb').read()).decode()}" class="logo" style="width:800px; margin:0 auto; display:block;">
     </div>
     """, unsafe_allow_html=True)
 st.markdown("""
