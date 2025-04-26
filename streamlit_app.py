@@ -55,7 +55,7 @@ COL = {
     "highlight"  : "rgb(122,164,140)",
 }
 
-# Enhanced CSS with better responsiveness and updated image display controls
+# Enhanced CSS with better responsiveness
 st.markdown(f"""
 <style>
   /* Base Styles */
@@ -155,7 +155,6 @@ st.markdown(f"""
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center; /* Center horizontally */
   }}
   .img-container img {{ 
     max-height: 500px; 
@@ -165,24 +164,6 @@ st.markdown(f"""
     display: block; 
     border-radius: 6px;
     transition: all 0.3s ease;
-    object-fit: contain;
-  }}
-  
-  /* Uploaded Image-specific styling - NEW */
-  .uploaded-image-container {{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    margin: 0 auto;
-    width: 100%;
-    text-align: center;
-  }}
-  
-  .uploaded-image-container img {{
-    min-height: 400px; /* Larger minimum height */
-    max-height: 600px; /* Larger maximum height */
-    margin: 0 auto;
     object-fit: contain;
   }}
   
@@ -243,31 +224,6 @@ st.markdown(f"""
     letter-spacing: 1px;
   }}
   
-  /* UPDATED: Analysis Results Images Style */
-  .analysis-image {{
-    width: 100% !important; /* Force full width */
-    height: auto !important;
-    min-height: 450px; /* Higher minimum height */
-    max-height: 650px; /* Higher maximum height */
-    object-fit: contain;
-    margin: 0 auto;
-    display: block;
-  }}
-  
-  /* Force all image elements to be large and fill container */
-  [data-testid="stImage"] {{
-    width: 100% !important;
-    display: flex;
-    justify-content: center;
-  }}
-  
-  /* Force all image elements to be large */
-  [data-testid="stImage"] > img {{
-    max-width: 100% !important;
-    min-height: 400px;
-    object-fit: contain !important;
-  }}
-  
   /* Metrics Cards */
   .metric-card {{
     background: linear-gradient(135deg, {COL['dark']}, {COL['accent']});
@@ -304,6 +260,23 @@ st.markdown(f"""
     font-size: 1rem; 
   }}
   
+  /* Custom Upload Image Size Control */
+  .uploaded-image {{
+    max-height: 450px;
+    width: auto !important;
+    object-fit: contain;
+  }}
+  
+  /* Analysis Results Images - NEW */
+  .analysis-img {{
+    min-height: 350px;
+    max-height: 450px;
+    width: auto;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+  }}
+  
   /* Equal Height Columns for Result Images */
   .equal-height-cols .element-container {{
     height: 100%;
@@ -312,24 +285,13 @@ st.markdown(f"""
   .equal-height-cols [data-testid="column"] {{
     display: flex;
     flex-direction: column;
-    height: 100%;
   }}
   
   .equal-height-cols .stImage {{
     flex-grow: 1;
-    display: flex !important;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-  }}
-  
-  /* Make images use the full space */
-  .equal-height-cols img {{
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 450px !important;
-    object-fit: contain !important;
   }}
   
   /* Responsive breakpoints */
@@ -352,9 +314,7 @@ st.markdown(f"""
     .metric-label {{ font-size: 0.9rem; }}
     .results-header {{ font-size: 1.3rem; margin: 20px 0 10px; }}
     img.logo {{ max-width: 600px; }}
-    .analysis-image {{ min-height: 300px; max-height: 400px; }}
-    .equal-height-cols img {{ min-height: 350px !important; }}
-    .uploaded-image-container img {{ min-height: 350px; max-height: 450px; }}
+    .analysis-img {{ min-height: 250px; max-height: 300px; }}
   }}
   
   /* Tablet Devices */
@@ -367,9 +327,7 @@ st.markdown(f"""
     }}
     figcaption p {{ font-size: 1.1rem !important; }}
     img.logo {{ max-width: 700px; }}
-    .analysis-image {{ min-height: 350px; max-height: 500px; }}
-    .equal-height-cols img {{ min-height: 400px !important; }}
-    .uploaded-image-container img {{ min-height: 380px; max-height: 500px; }}
+    .analysis-img {{ min-height: 300px; max-height: 350px; }}
   }}
   
   /* Handle content width based on layout */
@@ -381,9 +339,6 @@ st.markdown(f"""
       font-size: 1.2rem !important;
     }}
     figcaption p {{ font-size: 1.2rem !important; }}
-    .analysis-image {{ min-height: 450px; max-height: 650px; }}
-    .equal-height-cols img {{ min-height: 450px !important; }}
-    .uploaded-image-container img {{ min-height: 450px; max-height: 600px; }}
   }}
 </style>
 """, unsafe_allow_html=True)
@@ -509,12 +464,12 @@ if uploaded:
     pil = Image.open(uploaded).convert("RGB")
     orig_bgr = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
     
-    # Responsive image display with controlled size - UPDATED for larger center-aligned image
+    # Responsive image display with controlled size
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="uploaded-image-container">', unsafe_allow_html=True)
+    st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
-    # Use use_container_width=True to make the image fill the container width
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=True, output_format="PNG", 
+    # Use consistent parameters for image display
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", 
              clamp=True, channels="RGB")
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -549,9 +504,9 @@ if uploaded:
             display_mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
         else:
             display_mask = mask
-            
+             
         # Ensure both images are resized to the same dimensions for display
-        target_height = 500  # Increased target height for both images
+        target_height = 400  # Target height for both images
         
         # Calculate aspect ratio and resize
         mask_h, mask_w = display_mask.shape[:2]
@@ -566,18 +521,14 @@ if uploaded:
         
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            # Use use_container_width=True to make images fill their containers
             st.image(mask_display, caption="Wound Segmentation Mask", 
-                    use_container_width=True, clamp=True, output_format="PNG", 
-                    classes=["analysis-image"])
+                     use_container_width=False, clamp=True, output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            # Use use_container_width=True to make images fill their containers
             st.image(overlay_display, caption="Segmentation Overlay", 
-                    use_container_width=True, clamp=True, output_format="PNG",
-                    classes=["analysis-image"])
+                     use_container_width=False, clamp=True, output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
