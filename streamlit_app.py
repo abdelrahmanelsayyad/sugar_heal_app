@@ -520,7 +520,7 @@ if uploaded:
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
     # UPDATED: Use consistent parameters for image display with fixed centering
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, 
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=True, 
              output_format="PNG", clamp=True, channels="RGB", width=None)
     
     st.markdown('</div>', unsafe_allow_html=True)
