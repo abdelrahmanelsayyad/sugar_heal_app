@@ -147,7 +147,7 @@ st.markdown(f"""
     padding: 20px; 
     border-radius: 12px; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-    margin-bottom: 25px; 
+    margin-bottom: 5px; 
     transition: all 0.3s ease;
     overflow: hidden;
     text-align: center;
@@ -327,6 +327,7 @@ st.markdown(f"""
     width: 100% !important;
   }}
     .section-wrapper{{
+      width:100%;
     display:flex;
     align-items:center;
     justify-content:center;
