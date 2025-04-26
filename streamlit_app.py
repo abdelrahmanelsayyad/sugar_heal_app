@@ -205,6 +205,11 @@ st.markdown(f"""
     color: {COL['text_light']} !important;
     text-align: center !important;
   }}
+  .section-wrapper{{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }}
   
   /* Guidelines Box */
   .guidelines-box {{ 
@@ -330,6 +335,7 @@ st.markdown(f"""
   /* Mobile Devices */
   @media screen and (max-width: 768px) {{
     .header {{ padding: 15px; }}
+    .metric-card{{margin-top:10px;}}
     .header h1 {{ font-size: 1.5rem; }}
     .header p {{ font-size: 0.9rem; }}
     .instructions {{ padding: 15px; }}
