@@ -205,11 +205,7 @@ st.markdown(f"""
     color: {COL['text_light']} !important;
     text-align: center !important;
   }}
-  .section-wrapper{{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }}
+
   
   /* Guidelines Box */
   .guidelines-box {{ 
@@ -330,7 +326,11 @@ st.markdown(f"""
     justify-content: center !important;
     width: 100% !important;
   }}
-  
+    .section-wrapper{{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }}
   /* Responsive breakpoints - UPDATED FOR LARGER IMAGES ON ALL DEVICES */
   /* Mobile Devices */
   @media screen and (max-width: 768px) {{
@@ -371,7 +371,11 @@ st.markdown(f"""
   /* Handle content width based on layout */
   @media screen and (min-width: 1025px) {{
     .content-wrapper {{ max-width: 1200px; margin: 0 auto; }}
-    .section-wrapper {{ max-width: 90%; margin: 0 auto; }}
+    .section-wrapper {{ max-width: 90%; margin: 0 auto; 
+    display:flex;
+    align-items:center;
+    justify-content:center;
+   }}
     /* PC-specific text sizes */
     .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
       font-size: 1.2rem !important;
