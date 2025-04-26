@@ -573,13 +573,13 @@ if uploaded:
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
             st.image(mask_display, caption="Wound Segmentation Mask", 
-                     use_container_width=False, clamp=True, output_format="PNG", width=None)
+                     use_container_width=True, clamp=True, output_format="PNG", width=None)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
             st.image(overlay_display, caption="Segmentation Overlay", 
-                     use_container_width=False, clamp=True, output_format="PNG", width=None)
+                     use_container_width=True, clamp=True, output_format="PNG", width=None)
             st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
