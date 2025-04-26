@@ -76,7 +76,7 @@ st.markdown(f"""
 
 # ──── Header ───────────────────────────────────────────────────
 if LOGO_PATH.exists():
-    st.image(str(LOGO_PATH), use_container_width=False, width=800)
+    st.image(str(LOGO_PATH), use_container_width=False, width=600)
 st.markdown("""
 <div class="header">
   <h1>Sugar Heal – Wound Analysis</h1>
