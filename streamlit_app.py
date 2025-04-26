@@ -420,9 +420,9 @@ if uploaded:
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
-    # Custom class for better image size control on desktop
+    # Remove the class_name parameter which is causing the error
     st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", 
-             clamp=True, channels="RGB", class_name="uploaded-image")
+             clamp=True, channels="RGB")
     
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -450,14 +450,15 @@ if uploaded:
         
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            st.image(mask, caption="Wound Segmentation Mask", use_container_width=False, 
-                    class_name="uploaded-image")
+            # Remove class_name parameter here too
+            st.image(mask, caption="Wound Segmentation Mask", use_container_width=False)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
+            # Remove class_name parameter here too
             st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Segmentation Overlay", 
-                    use_container_width=False, class_name="uploaded-image")
+                    use_container_width=False)
             st.markdown('</div>', unsafe_allow_html=True)
         
         # Enhanced metrics display with custom styling
