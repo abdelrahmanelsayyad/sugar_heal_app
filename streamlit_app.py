@@ -160,12 +160,14 @@ st.markdown(f"""
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
 # ──── Header ───────────────────────────────────────────────────
+# ──── Header ───────────────────────────────────────────────────
 if LOGO_PATH.exists():
     st.markdown(f"""
-    <div style="background-color:{COL['highlight']}; padding:10px; border-radius:10px; text-align:center; margin-bottom:15px;">
-        <img src="data:image/png;base64,{base64.b64encode(open(str(LOGO_PATH), 'rb').read()).decode()}" class="logo">
+    <div style="background-color:{COL['highlight']}; padding:10px; border-radius:10px; text-align:center; margin-bottom:15px; overflow:hidden;">
+        <img src="data:image/png;base64,{base64.b64encode(open(str(LOGO_PATH), 'rb').read()).decode()}" class="logo" style="border-radius:8px;">
     </div>
     """, unsafe_allow_html=True)
+
 st.markdown("""
 <div class="header">
   <h1>Sugar Heal – Wound Analysis</h1>
