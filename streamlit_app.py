@@ -17,7 +17,7 @@ from tensorflow.keras import backend as K
 st.set_page_config(
     page_title="Sugar Heal – Wound Analysis",
     page_icon="🩹",
-    layout="centered",  # Changed to centered for better mobile view
+    layout="wide",  # Use wide layout for PC
     initial_sidebar_state="collapsed"
 )
 
@@ -55,43 +55,227 @@ COL = {
     "highlight"  : "rgb(122,164,140)",
 }
 
-# Fixed CSS with proper media query syntax
+# Enhanced CSS with better responsiveness
 st.markdown(f"""
 <style>
+  /* Base Styles */
   body {{ background-color: {COL['surface']}; color: {COL['text_dark']}; font-family: 'Helvetica Neue', Arial, sans-serif; }}
-  .header {{ text-align: center; padding: 15px; background: linear-gradient(135deg, {COL['primary']}, {COL['dark']}); color: {COL['text_light']}; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-bottom: 20px; }}
-  .header h1 {{ margin:0; font-size:1.8rem; font-weight:600; letter-spacing:1px; }}
-  .header p {{ font-size: 1rem; margin-top: 5px; }}
-  .instructions {{ background-color: {COL['dark']}; padding:15px; border-left:6px solid {COL['accent']}; border-radius:8px; margin-bottom:20px; color:{COL['text_light']}; }}
-  .instructions strong {{ color:{COL['highlight']}; font-size:1.1rem; }}
-  .instructions ol {{ padding-left: 20px; }}
-  img.logo {{ display:block; margin:0 auto; width:100%!important; max-width:600px; padding:5px; }}
-  .stButton>button {{ background-color:{COL['primary']}; color:white; border:none; border-radius:6px; padding:10px 24px; font-weight:500; transition:all .3s ease; box-shadow:0 2px 5px rgba(0,0,0,.2); width:100%; }}
-  .stButton>button:hover {{ background-color:{COL['dark']}; transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,.3); }}
-  .css-1cpxqw2 {{ border:2px dashed {COL['accent']}; background-color:{COL['surface']}; border-radius:8px; padding:15px; }}
-  .img-container {{ background-color:{COL['dark']}; padding:10px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,.2); margin-bottom:20px; }}
-  .img-container img {{ max-height:400px!important; width:auto!important; margin:0 auto; display:block; }}
-  .guidelines-box {{ background-color:{COL['dark']}; padding:15px; border-radius:8px; color:{COL['text_light']}; margin-bottom:15px; }}
-  .guidelines-box h4 {{ color:{COL['highlight']}; margin-top:0; font-size:1.1rem; }}
-  .guidelines-box ul {{ padding-left: 20px; margin-bottom: 0; }}
-  .footer {{ text-align:center; padding:15px 0; margin-top:30px; border-top:1px solid {COL['dark']}; color:{COL['light']}; font-size:.9rem; }}
   
-  /* Mobile-specific styles with proper syntax */
+  /* Header Styles */
+  .header {{ 
+    text-align: center; 
+    padding: 20px; 
+    background: linear-gradient(135deg, {COL['primary']}, {COL['dark']}); 
+    color: {COL['text_light']}; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+    margin-bottom: 25px; 
+    transition: all 0.3s ease;
+  }}
+  .header h1 {{ margin:0; font-size:2.2rem; font-weight:600; letter-spacing:1px; }}
+  .header p {{ font-size: 1.1rem; margin-top: 8px; opacity: 0.9; }}
+  
+  /* Instructions Box */
+  .instructions {{ 
+    background-color: {COL['dark']}; 
+    padding: 20px; 
+    border-left: 6px solid {COL['accent']}; 
+    border-radius: 8px; 
+    margin-bottom: 25px; 
+    color: {COL['text_light']}; 
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  }}
+  .instructions strong {{ color:{COL['highlight']}; font-size:1.2rem; }}
+  .instructions ol {{ padding-left: 25px; margin-top: 10px; }}
+  .instructions li {{ margin-bottom: 5px; }}
+  
+  /* Logo and Container Styles */
+  .logo-container {{
+    background-color: {COL['highlight']}; 
+    padding: 15px; 
+    border-radius: 10px; 
+    text-align: center; 
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }}
+  img.logo {{ 
+    display: block; 
+    margin: 0 auto; 
+    width: 100%; 
+    max-width: 600px; 
+    padding: 5px; 
+    transition: all 0.3s ease;
+  }}
+  
+  /* Button Styling */
+  .stButton>button {{ 
+    background: linear-gradient(135deg, {COL['primary']}, {COL['dark']}); 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    padding: 12px 28px; 
+    font-weight: 500; 
+    transition: all .3s ease; 
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25); 
+    width: 100%;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }}
+  .stButton>button:hover {{ 
+    background: linear-gradient(135deg, {COL['accent']}, {COL['primary']}); 
+    transform: translateY(-2px); 
+    box-shadow: 0 5px 12px rgba(0,0,0,0.35); 
+  }}
+  
+  /* File Uploader */
+  .css-1cpxqw2, [data-testid="stFileUploader"] {{ 
+    border: 2px dashed {COL['accent']}; 
+    background-color: rgba(59, 108, 83, 0.1); 
+    border-radius: 10px; 
+    padding: 20px; 
+    transition: all 0.3s ease;
+  }}
+  .css-1cpxqw2:hover, [data-testid="stFileUploader"]:hover {{ 
+    border-color: {COL['highlight']}; 
+    background-color: rgba(59, 108, 83, 0.2);
+  }}
+  
+  /* Image Container */
+  .img-container {{ 
+    background-color: {COL['dark']}; 
+    padding: 15px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    margin-bottom: 25px; 
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }}
+  .img-container img {{ 
+    max-height: 500px; 
+    width: auto; 
+    margin: 0 auto; 
+    display: block; 
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }}
+  
+  /* Guidelines Box */
+  .guidelines-box {{ 
+    background-color: {COL['dark']}; 
+    padding: 18px; 
+    border-radius: 10px; 
+    color: {COL['text_light']}; 
+    margin-bottom: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    border-left: 4px solid {COL['highlight']};
+  }}
+  .guidelines-box h4 {{ 
+    color: {COL['highlight']}; 
+    margin-top: 0; 
+    font-size: 1.2rem; 
+    font-weight: 500;
+  }}
+  .guidelines-box ul {{ padding-left: .5rem; margin-bottom: 0; list-style-type: none; }}
+  .guidelines-box ul li {{ 
+    padding-left: 1.5rem; 
+    position: relative;
+    margin-bottom: 8px;
+  }}
+  .guidelines-box ul li:before {{ 
+    content: "✓"; 
+    color: {COL['highlight']};
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+  }}
+  
+  /* Results Section */
+  .results-header {{
+    text-align: center;
+    color: {COL['highlight']};
+    margin: 25px 0 15px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }}
+  
+  /* Metrics Cards */
+  .metric-card {{
+    background: linear-gradient(135deg, {COL['dark']}, {COL['accent']});
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: all 0.3s ease;
+  }}
+  .metric-card:hover {{
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  }}
+  .metric-value {{
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: {COL['text_light']};
+  }}
+  .metric-label {{
+    font-size: 1rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+  }}
+  
+  /* Footer */
+  .footer {{ 
+    text-align: center; 
+    padding: 20px 0; 
+    margin-top: 40px; 
+    border-top: 1px solid {COL['dark']}; 
+    color: {COL['light']}; 
+    font-size: 1rem; 
+  }}
+  
+  /* Responsive breakpoints */
+  /* Mobile Devices */
   @media screen and (max-width: 768px) {{
+    .header {{ padding: 15px; }}
     .header h1 {{ font-size: 1.5rem; }}
     .header p {{ font-size: 0.9rem; }}
+    .instructions {{ padding: 15px; }}
     .instructions strong {{ font-size: 1rem; }}
     .guidelines-box h4 {{ font-size: 1rem; }}
     .guidelines-box ul {{ font-size: 0.9rem; }}
-    .stButton>button {{ padding: 8px 16px; }}
+    .stButton>button {{ padding: 10px 18px; font-size: 1rem; }}
+    .img-container img {{ max-height: 300px; }}
+    .metric-value {{ font-size: 1.5rem; }}
+    .metric-label {{ font-size: 0.9rem; }}
+    .results-header {{ font-size: 1.3rem; margin: 20px 0 10px; }}
+  }}
+  
+  /* Tablet Devices */
+  @media screen and (min-width: 769px) and (max-width: 1024px) {{
+    .header h1 {{ font-size: 1.8rem; }}
+    .header p {{ font-size: 1rem; }}
+    .img-container img {{ max-height: 400px; }}
+  }}
+  
+  /* Handle content width based on layout */
+  @media screen and (min-width: 1025px) {{
+    .content-wrapper {{ max-width: 1200px; margin: 0 auto; }}
+    .section-wrapper {{ max-width: 90%; margin: 0 auto; }}
   }}
 </style>
 """, unsafe_allow_html=True)
 
+# ──── Page Layout ────────────────────────────────────────────────
+st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
+
 # ──── Header ───────────────────────────────────────────────────
 if LOGO_PATH.exists():
     st.markdown(f"""
-    <div style="background-color:{COL['highlight']}; padding:10px; border-radius:10px; text-align:center; margin-bottom:15px;">
+    <div class="logo-container">
         <img src="data:image/png;base64,{base64.b64encode(open(str(LOGO_PATH), 'rb').read()).decode()}" class="logo">
     </div>
     """, unsafe_allow_html=True)
@@ -153,67 +337,105 @@ def calculate_wound_area(mask):
     return int(np.sum(mask > 0))
 
 # ──── Instructions ─────────────────────────────────────────────
+st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
 st.markdown("""
 <div class="instructions">
   <strong>📋 How to use this tool:</strong><br>
   <ol>
     <li>Upload a clear wound image (PNG/JPG/JPEG)</li>
     <li>Click <b>Analyze Wound</b></li>
-    <li>View segmented mask & overlay</li>
+    <li>View segmented mask & overlay with detailed metrics</li>
   </ol>
 </div>
 """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ──── Upload & Analysis ────────────────────────────────────────
-# For mobile, use a single column layout
-uploaded = st.file_uploader("Upload wound image", type=["png","jpg","jpeg"])
+# Responsive layout that adapts to screen size
+col1, col2 = st.columns([2, 1]) 
 
-# Guidelines box
-st.markdown("""
-  <div class="guidelines-box">
-    <h4>📸 Image Guidelines</h4>
-    <ul>
-      <li>Good lighting</li>
-      <li>Wound clearly visible</li>
-      <li>Consistent distance</li>
-      <li>Include reference scale</li>
-    </ul>
-  </div>
-""", unsafe_allow_html=True)
+with col1:
+    uploaded = st.file_uploader("Upload wound image", type=["png","jpg","jpeg"])
+
+with col2:
+    # Guidelines box
+    st.markdown("""
+    <div class="guidelines-box">
+        <h4>📸 Image Guidelines</h4>
+        <ul>
+            <li>Good lighting</li>
+            <li>Wound clearly visible</li>
+            <li>Consistent distance</li>
+            <li>Include reference scale</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
 if uploaded:
     pil = Image.open(uploaded).convert("RGB")
     orig_bgr = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
+    
+    # Responsive image display
+    st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
-    # Kept use_container_width=False as requested
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=False)
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Full-width button for better mobile tap targets
+    # Full-width button for better mobile tap targets and UX
+    st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     if st.button("Analyze Wound", help="Click to run AI analysis"):
-        progress = st.progress(0)
-        for i in range(100):
-            progress.progress(i+1)
-            if i==30:
-                mask = predict_mask(orig_bgr)
-            if i==70:
-                overlay = make_overlay(orig_bgr, mask)
-                area = calculate_wound_area(mask)
-        progress.empty()
-        st.success("Analysis complete!")
-        st.markdown(f"<h3 style='text-align:center;color:{COL['highlight']}'>Results</h3>", unsafe_allow_html=True)
+        with st.spinner("Processing wound image..."):
+            # Show a more detailed progress bar
+            progress = st.progress(0)
+            for i in range(100):
+                progress.progress(i+1)
+                if i==30:
+                    mask = predict_mask(orig_bgr)
+                if i==70:
+                    overlay = make_overlay(orig_bgr, mask)
+                    area = calculate_wound_area(mask)
+            progress.empty()
         
-        # Display results in stacked format for mobile (better than side-by-side)
-        st.image(mask, caption="Mask", clamp=True, use_container_width=False)
-        st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Overlay", use_container_width=False)
+        st.success("✅ Analysis complete!")
+        st.markdown('<div class="results-header">Analysis Results</div>', unsafe_allow_html=True)
         
-        # Metrics in a more compact form
+        # Responsive results display - adjust based on screen size
         col1, col2 = st.columns(2)
+        
         with col1:
-            st.metric("Wound Area (px)", f"{area:,}")
+            st.markdown('<div class="img-container">', unsafe_allow_html=True)
+            st.image(mask, caption="Wound Segmentation Mask", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        
         with col2:
+            st.markdown('<div class="img-container">', unsafe_allow_html=True)
+            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Segmentation Overlay", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Enhanced metrics display with custom styling
+        st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;'>Wound Metrics</h3>", unsafe_allow_html=True)
+        
+        metric_col1, metric_col2 = st.columns(2)
+        
+        with metric_col1:
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value">{area:,}</div>
+                <div class="metric-label">Wound Area (pixels)</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with metric_col2:
             pct = area/(mask.shape[0]*mask.shape[1])*100
-            st.metric("Coverage", f"{pct:.2f}%")
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value">{pct:.2f}%</div>
+                <div class="metric-label">Coverage</div>
+            </div>
+            """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ──── Footer ───────────────────────────────────────────────────
-st.markdown(f"<div class='footer'>© 2025 Sugar Heal AI</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='footer'>© 2025 Sugar Heal AI • Advanced Wound Analysis</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)  # Close content-wrapper
