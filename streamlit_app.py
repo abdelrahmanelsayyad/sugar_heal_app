@@ -14,26 +14,12 @@ import streamlit as st
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-# Set favicon and responsive layout
-LOGO_PATH = Path("GREEN.png")
-if LOGO_PATH.exists():
-    # Read the image file
-    with open(str(LOGO_PATH), "rb") as f:
-        favicon_data = f.read()
-    # Set favicon using base64 encoded image
-    st.set_page_config(
-        page_title="Sugar Heal – Wound Analysis",
-        page_icon=Image.open(io.BytesIO(favicon_data)),
-        layout="wide",  # Wide layout for desktop
-        initial_sidebar_state="collapsed"
-    )
-else:
-    st.set_page_config(
-        page_title="Sugar Heal – Wound Analysis",
-        page_icon="🩹",
-        layout="wide",  # Wide layout for desktop
-        initial_sidebar_state="collapsed"
-    )
+st.set_page_config(
+    page_title="Sugar Heal – Wound Analysis",
+    page_icon="🩹",
+    layout="centered",  # Changed to centered for better mobile view
+    initial_sidebar_state="collapsed"
+)
 
 # ──── Config ───────────────────────────────────────────────────
 MODEL_PATH = Path("unet_wound_segmentation_best.h5")
@@ -69,10 +55,9 @@ COL = {
     "highlight"  : "rgb(122,164,140)",
 }
 
-# Improved CSS with better responsive design
+# Fixed CSS with proper media query syntax
 st.markdown(f"""
 <style>
-  /* Base styles */
   body {{ background-color: {COL['surface']}; color: {COL['text_dark']}; font-family: 'Helvetica Neue', Arial, sans-serif; }}
   .header {{ text-align: center; padding: 15px; background: linear-gradient(135deg, {COL['primary']}, {COL['dark']}); color: {COL['text_light']}; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-bottom: 20px; }}
   .header h1 {{ margin:0; font-size:1.8rem; font-weight:600; letter-spacing:1px; }}
@@ -91,73 +76,17 @@ st.markdown(f"""
   .guidelines-box ul {{ padding-left: 20px; margin-bottom: 0; }}
   .footer {{ text-align:center; padding:15px 0; margin-top:30px; border-top:1px solid {COL['dark']}; color:{COL['light']}; font-size:.9rem; }}
   
-  /* Container styles for desktop/mobile adaptivity */
-  .main-container {{
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }}
-  
-  /* Make app container responsive */
-  .block-container {{
-    max-width: 100%;
-    padding-top: 1rem;
-    padding-right: 1rem;
-    padding-left: 1rem;
-    padding-bottom: 1rem;
-  }}
-  
-  /* Desktop styles */
-  @media screen and (min-width: 992px) {{
-    .content-wrapper {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }}
-    .upload-section {{
-      flex: 1;
-      min-width: 300px;
-    }}
-    .results-section {{
-      flex: 2;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }}
-    .result-image {{
-      flex: 1;
-      min-width: 300px;
-    }}
-    .header h1 {{ font-size: 2.2rem; }}
-    .block-container {{
-      max-width: 1200px;
-      margin: 0 auto;
-    }}
-  }}
-  
-  /* Tablet styles */
-  @media screen and (min-width: 768px) and (max-width: 991px) {{
-    .header h1 {{ font-size: 1.8rem; }}
-  }}
-  
-  /* Mobile styles */
-  @media screen and (max-width: 767px) {{
+  /* Mobile-specific styles with proper syntax */
+  @media screen and (max-width: 768px) {{
     .header h1 {{ font-size: 1.5rem; }}
     .header p {{ font-size: 0.9rem; }}
     .instructions strong {{ font-size: 1rem; }}
     .guidelines-box h4 {{ font-size: 1rem; }}
     .guidelines-box ul {{ font-size: 0.9rem; }}
     .stButton>button {{ padding: 8px 16px; }}
-    .block-container {{
-      padding: 0.5rem;
-    }}
   }}
 </style>
 """, unsafe_allow_html=True)
-
-# Create a responsive container
-st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
 # ──── Header ───────────────────────────────────────────────────
 if LOGO_PATH.exists():
@@ -236,11 +165,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ──── Upload & Analysis ────────────────────────────────────────
-# Start responsive content wrapper
-st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
-
-# Upload section
-st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+# For mobile, use a single column layout
 uploaded = st.file_uploader("Upload wound image", type=["png","jpg","jpeg"])
 
 # Guidelines box
@@ -256,18 +181,12 @@ st.markdown("""
   </div>
 """, unsafe_allow_html=True)
 
-# Close upload section
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Results section - will be shown when image is uploaded
 if uploaded:
     pil = Image.open(uploaded).convert("RGB")
     orig_bgr = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
-    
-    # Show image in its own container
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
-    # Use container width on mobile, but not on desktop (responsive setting)
-    st.image(pil, caption="Uploaded Wound Image", use_column_width=True)
+    # Kept use_container_width=False as requested
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=False)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Full-width button for better mobile tap targets
@@ -284,35 +203,17 @@ if uploaded:
         st.success("Analysis complete!")
         st.markdown(f"<h3 style='text-align:center;color:{COL['highlight']}'>Results</h3>", unsafe_allow_html=True)
         
-        # Open results section - will adjust based on screen size
-        st.markdown('<div class="results-section">', unsafe_allow_html=True)
+        # Display results in stacked format for mobile (better than side-by-side)
+        st.image(mask, caption="Mask", clamp=True, use_container_width=False)
+        st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Overlay", use_container_width=False)
         
-        # First result image
-        st.markdown('<div class="result-image">', unsafe_allow_html=True)
-        st.image(mask, caption="Mask", clamp=True, use_column_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Second result image
-        st.markdown('<div class="result-image">', unsafe_allow_html=True)
-        st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Overlay", use_column_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Close results section
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Metrics in a more compact form - these will stack on mobile automatically
+        # Metrics in a more compact form
         col1, col2 = st.columns(2)
         with col1:
             st.metric("Wound Area (px)", f"{area:,}")
         with col2:
             pct = area/(mask.shape[0]*mask.shape[1])*100
             st.metric("Coverage", f"{pct:.2f}%")
-
-# Close content wrapper
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Close main container 
-st.markdown('</div>', unsafe_allow_html=True)
 
 # ──── Footer ───────────────────────────────────────────────────
 st.markdown(f"<div class='footer'>© 2025 Sugar Heal AI</div>", unsafe_allow_html=True)
