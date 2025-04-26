@@ -103,7 +103,7 @@ st.markdown(f"""
     display: block; 
     margin: 0 auto; 
     width: 100%; 
-    max-width: 600px; 
+    max-width: 800px; /* Increased logo size for PC */
     padding: 5px; 
     transition: all 0.3s ease;
   }}
@@ -150,14 +150,33 @@ st.markdown(f"""
     margin-bottom: 25px; 
     transition: all 0.3s ease;
     overflow: hidden;
+    text-align: center;
   }}
   .img-container img {{ 
     max-height: 500px; 
-    width: auto; 
+    max-width: 100%;
+    width: auto !important; 
     margin: 0 auto; 
     display: block; 
     border-radius: 6px;
     transition: all 0.3s ease;
+    object-fit: contain;
+  }}
+  
+  /* Image Captions */
+  .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
+    font-size: 1.2rem !important;  /* Larger text for PC */
+    color: {COL['text_light']} !important;
+    margin-top: 12px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+  }}
+  
+  /* Style all Streamlit caption texts */
+  figcaption p {{
+    font-size: 1.2rem !important;
+    margin: 8px 0 !important;
+    color: {COL['text_light']} !important;
   }}
   
   /* Guidelines Box */
@@ -195,7 +214,7 @@ st.markdown(f"""
     text-align: center;
     color: {COL['highlight']};
     margin: 25px 0 15px;
-    font-size: 1.5rem;
+    font-size: 1.8rem;  /* Larger for PC */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -237,6 +256,13 @@ st.markdown(f"""
     font-size: 1rem; 
   }}
   
+  /* Custom Upload Image Size Control */
+  .uploaded-image {{
+    max-height: 450px;
+    width: auto !important;
+    object-fit: contain;
+  }}
+  
   /* Responsive breakpoints */
   /* Mobile Devices */
   @media screen and (max-width: 768px) {{
@@ -249,9 +275,14 @@ st.markdown(f"""
     .guidelines-box ul {{ font-size: 0.9rem; }}
     .stButton>button {{ padding: 10px 18px; font-size: 1rem; }}
     .img-container img {{ max-height: 300px; }}
+    .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
+      font-size: 0.9rem !important;
+    }}
+    figcaption p {{ font-size: 0.9rem !important; }}
     .metric-value {{ font-size: 1.5rem; }}
     .metric-label {{ font-size: 0.9rem; }}
     .results-header {{ font-size: 1.3rem; margin: 20px 0 10px; }}
+    img.logo {{ max-width: 600px; }}
   }}
   
   /* Tablet Devices */
@@ -259,12 +290,22 @@ st.markdown(f"""
     .header h1 {{ font-size: 1.8rem; }}
     .header p {{ font-size: 1rem; }}
     .img-container img {{ max-height: 400px; }}
+    .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
+      font-size: 1.1rem !important;
+    }}
+    figcaption p {{ font-size: 1.1rem !important; }}
+    img.logo {{ max-width: 700px; }}
   }}
   
   /* Handle content width based on layout */
   @media screen and (min-width: 1025px) {{
     .content-wrapper {{ max-width: 1200px; margin: 0 auto; }}
     .section-wrapper {{ max-width: 90%; margin: 0 auto; }}
+    /* PC-specific text sizes */
+    .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
+      font-size: 1.2rem !important;
+    }}
+    figcaption p {{ font-size: 1.2rem !important; }}
   }}
 </style>
 """, unsafe_allow_html=True)
@@ -375,10 +416,14 @@ if uploaded:
     pil = Image.open(uploaded).convert("RGB")
     orig_bgr = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
     
-    # Responsive image display
+    # Responsive image display with controlled size
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=True)
+    
+    # Custom class for better image size control on desktop
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", 
+             clamp=True, channels="RGB", class_name="uploaded-image")
+    
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -405,16 +450,18 @@ if uploaded:
         
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            st.image(mask, caption="Wound Segmentation Mask", use_container_width=True)
+            st.image(mask, caption="Wound Segmentation Mask", use_container_width=False, 
+                    class_name="uploaded-image")
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Segmentation Overlay", use_container_width=True)
+            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Segmentation Overlay", 
+                    use_container_width=False, class_name="uploaded-image")
             st.markdown('</div>', unsafe_allow_html=True)
         
         # Enhanced metrics display with custom styling
-        st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;'>Wound Metrics</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;font-size:1.5rem;'>Wound Metrics</h3>", unsafe_allow_html=True)
         
         metric_col1, metric_col2 = st.columns(2)
         
