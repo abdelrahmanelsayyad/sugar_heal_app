@@ -1,7 +1,4 @@
 # streamlit_app.py
-# NOTE: Only the lines explicitly marked >>> were changed to make
-#       the two result images identical in width/length
-#       and to keep them responsive on mobile.
 
 import io
 import os
@@ -32,6 +29,7 @@ IMG_SIZE   = 256
 THRESHOLD  = 0.5
 ALPHA      = 0.4
 
+# Download model from Google Drive if not present
 def download_model():
     if not MODEL_PATH.exists():
         try:
@@ -41,9 +39,10 @@ def download_model():
             import gdown
         gdown.download(MODEL_URL, str(MODEL_PATH), quiet=False)
 
+# Ensure model is available
 download_model()
 
-# ──── Color Palette & CSS ──────────────────────────────────────
+# ──── Color Palette & CSS ───────────────────────────────────────────────────────
 COL = {
     "primary"    : "#074225",
     "secondary"  : "#41706F",
@@ -56,37 +55,217 @@ COL = {
     "highlight"  : "rgb(122,164,140)",
 }
 
+# Enhanced CSS with better responsiveness
 st.markdown(f"""
 <style>
-  /* --- existing styles remain unchanged --- */
-
+  /* Base Styles */
+  body {{ background-color: {COL['surface']}; color: {COL['text_dark']}; font-family: 'Helvetica Neue', Arial, sans-serif; }}
+  
+  /* Header Styles */
+  .header {{ 
+    text-align: center; 
+    padding: 20px; 
+    background: linear-gradient(135deg, {COL['primary']}, {COL['dark']}); 
+    color: {COL['text_light']}; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+    margin-bottom: 25px; 
+    transition: all 0.3s ease;
+  }}
+  .header h1 {{ margin:0; font-size:2.2rem; font-weight:600; letter-spacing:1px; }}
+  .header p {{ font-size: 1.1rem; margin-top: 8px; opacity: 0.9; }}
+  
+  /* Instructions Box */
+  .instructions {{ 
+    background-color: {COL['dark']}; 
+    padding: 20px; 
+    border-left: 6px solid {COL['accent']}; 
+    border-radius: 8px; 
+    margin-bottom: 25px; 
+    color: {COL['text_light']}; 
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  }}
+  .instructions strong {{ color:{COL['highlight']}; font-size:1.2rem; }}
+  .instructions ol {{ padding-left: 25px; margin-top: 10px; }}
+  .instructions li {{ margin-bottom: 5px; }}
+  
+  /* Logo and Container Styles */
+  .logo-container {{
+    background-color: {COL['highlight']}; 
+    padding: 15px; 
+    border-radius: 10px; 
+    text-align: center; 
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }}
+  img.logo {{ 
+    display: block; 
+    margin: 0 auto; 
+    width: 100%; 
+    max-width: 600px; 
+    padding: 5px; 
+    transition: all 0.3s ease;
+  }}
+  
+  /* Button Styling */
+  .stButton>button {{ 
+    background: linear-gradient(135deg, {COL['primary']}, {COL['dark']}); 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    padding: 12px 28px; 
+    font-weight: 500; 
+    transition: all .3s ease; 
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25); 
+    width: 100%;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }}
+  .stButton>button:hover {{ 
+    background: linear-gradient(135deg, {COL['accent']}, {COL['primary']}); 
+    transform: translateY(-2px); 
+    box-shadow: 0 5px 12px rgba(0,0,0,0.35); 
+  }}
+  
+  /* File Uploader */
+  .css-1cpxqw2, [data-testid="stFileUploader"] {{ 
+    border: 2px dashed {COL['accent']}; 
+    background-color: rgba(59, 108, 83, 0.1); 
+    border-radius: 10px; 
+    padding: 20px; 
+    transition: all 0.3s ease;
+  }}
+  .css-1cpxqw2:hover, [data-testid="stFileUploader"]:hover {{ 
+    border-color: {COL['highlight']}; 
+    background-color: rgba(59, 108, 83, 0.2);
+  }}
+  
   /* Image Container */
-  .img-container {{
-    background-color: {COL['dark']};
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    margin-bottom: 25px;
+  .img-container {{ 
+    background-color: {COL['dark']}; 
+    padding: 15px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    margin-bottom: 25px; 
     transition: all 0.3s ease;
     overflow: hidden;
-    text-align: center;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }}
-  .img-container img {{
-    max-height: 500px;
-    max-width: 100%;
-    width: 100% !important;        /* >>> force equal width */
-    margin: 0 auto;
-    display: block;
+  .img-container img {{ 
+    max-height: 500px; 
+    width: auto; 
+    margin: 0 auto; 
+    display: block; 
     border-radius: 6px;
     transition: all 0.3s ease;
-    object-fit: contain;
   }}
-
-  /* --- rest of the original CSS is unchanged --- */
+  
+  /* Guidelines Box */
+  .guidelines-box {{ 
+    background-color: {COL['dark']}; 
+    padding: 18px; 
+    border-radius: 10px; 
+    color: {COL['text_light']}; 
+    margin-bottom: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    border-left: 4px solid {COL['highlight']};
+  }}
+  .guidelines-box h4 {{ 
+    color: {COL['highlight']}; 
+    margin-top: 0; 
+    font-size: 1.2rem; 
+    font-weight: 500;
+  }}
+  .guidelines-box ul {{ padding-left: .5rem; margin-bottom: 0; list-style-type: none; }}
+  .guidelines-box ul li {{ 
+    padding-left: 1.5rem; 
+    position: relative;
+    margin-bottom: 8px;
+  }}
+  .guidelines-box ul li:before {{ 
+    content: "✓"; 
+    color: {COL['highlight']};
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+  }}
+  
+  /* Results Section */
+  .results-header {{
+    text-align: center;
+    color: {COL['highlight']};
+    margin: 25px 0 15px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }}
+  
+  /* Metrics Cards */
+  .metric-card {{
+    background: linear-gradient(135deg, {COL['dark']}, {COL['accent']});
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: all 0.3s ease;
+  }}
+  .metric-card:hover {{
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  }}
+  .metric-value {{
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: {COL['text_light']};
+  }}
+  .metric-label {{
+    font-size: 1rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+  }}
+  
+  /* Footer */
+  .footer {{ 
+    text-align: center; 
+    padding: 20px 0; 
+    margin-top: 40px; 
+    border-top: 1px solid {COL['dark']}; 
+    color: {COL['light']}; 
+    font-size: 1rem; 
+  }}
+  
+  /* Responsive breakpoints */
+  /* Mobile Devices */
+  @media screen and (max-width: 768px) {{
+    .header {{ padding: 15px; }}
+    .header h1 {{ font-size: 1.5rem; }}
+    .header p {{ font-size: 0.9rem; }}
+    .instructions {{ padding: 15px; }}
+    .instructions strong {{ font-size: 1rem; }}
+    .guidelines-box h4 {{ font-size: 1rem; }}
+    .guidelines-box ul {{ font-size: 0.9rem; }}
+    .stButton>button {{ padding: 10px 18px; font-size: 1rem; }}
+    .img-container img {{ max-height: 300px; }}
+    .metric-value {{ font-size: 1.5rem; }}
+    .metric-label {{ font-size: 0.9rem; }}
+    .results-header {{ font-size: 1.3rem; margin: 20px 0 10px; }}
+  }}
+  
+  /* Tablet Devices */
+  @media screen and (min-width: 769px) and (max-width: 1024px) {{
+    .header h1 {{ font-size: 1.8rem; }}
+    .header p {{ font-size: 1rem; }}
+    .img-container img {{ max-height: 400px; }}
+  }}
+  
+  /* Handle content width based on layout */
+  @media screen and (min-width: 1025px) {{
+    .content-wrapper {{ max-width: 1200px; margin: 0 auto; }}
+    .section-wrapper {{ max-width: 90%; margin: 0 auto; }}
+  }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -137,7 +316,7 @@ except Exception as e:
     st.error(f"❌ Failed to load model: {e}")
     st.stop()
 
-# ──── Preprocessing & Prediction ───────────────────────────────
+# ──── Preprocessing & Prediction ─────────────────────────────────
 def preprocess(img_bgr: np.ndarray) -> np.ndarray:
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     img_rgb = cv2.resize(img_rgb, (IMG_SIZE, IMG_SIZE))
@@ -145,22 +324,17 @@ def preprocess(img_bgr: np.ndarray) -> np.ndarray:
 
 def predict_mask(img_bgr: np.ndarray) -> np.ndarray:
     prob = model.predict(preprocess(img_bgr), verbose=0)[0, ..., 0]
-    mask = (prob > THRESHOLD).astype("uint8") * 255
-    if len(mask.shape) == 2:
-        mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
-    return mask
+    return (prob > THRESHOLD).astype("uint8") * 255
 
 def make_overlay(orig_bgr, mask):
     h, w = orig_bgr.shape[:2]
-    mask_gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY) if len(mask.shape) == 3 else mask
-    mask_r = cv2.resize(mask_gray, (w, h), cv2.INTER_NEAREST)
+    mask_r = cv2.resize(mask, (w, h), cv2.INTER_NEAREST)
     overlay = orig_bgr.copy()
-    overlay[mask_r == 255] = (122, 164, 140)
-    return cv2.addWeighted(overlay, ALPHA, orig_bgr, 1 - ALPHA, 0)
+    overlay[mask_r==255] = (122,164,140)
+    return cv2.addWeighted(overlay, ALPHA, orig_bgr, 1-ALPHA, 0)
 
 def calculate_wound_area(mask):
-    mask_gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY) if len(mask.shape) == 3 else mask
-    return int(np.sum(mask_gray > 0))
+    return int(np.sum(mask > 0))
 
 # ──── Instructions ─────────────────────────────────────────────
 st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
@@ -177,12 +351,14 @@ st.markdown("""
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ──── Upload & Analysis ────────────────────────────────────────
-col1, col2 = st.columns([2, 1])
+# Responsive layout that adapts to screen size
+col1, col2 = st.columns([2, 1]) 
 
 with col1:
-    uploaded = st.file_uploader("Upload wound image", type=["png", "jpg", "jpeg"])
+    uploaded = st.file_uploader("Upload wound image", type=["png","jpg","jpeg"])
 
 with col2:
+    # Guidelines box
     st.markdown("""
     <div class="guidelines-box">
         <h4>📸 Image Guidelines</h4>
@@ -198,75 +374,50 @@ with col2:
 if uploaded:
     pil = Image.open(uploaded).convert("RGB")
     orig_bgr = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
-
+    
+    # Responsive image display
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", clamp=True, channels="RGB")
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-
+    
+    # Full-width button for better mobile tap targets and UX
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     if st.button("Analyze Wound", help="Click to run AI analysis"):
         with st.spinner("Processing wound image..."):
+            # Show a more detailed progress bar
             progress = st.progress(0)
             for i in range(100):
-                progress.progress(i + 1)
-                if i == 30:
+                progress.progress(i+1)
+                if i==30:
                     mask = predict_mask(orig_bgr)
-                if i == 70:
+                if i==70:
                     overlay = make_overlay(orig_bgr, mask)
                     area = calculate_wound_area(mask)
             progress.empty()
-
+        
         st.success("✅ Analysis complete!")
         st.markdown('<div class="results-header">Analysis Results</div>', unsafe_allow_html=True)
-        st.markdown('<div class="equal-height-cols">', unsafe_allow_html=True)
-
+        
+        # Responsive results display - adjust based on screen size
         col1, col2 = st.columns(2)
-
-        if len(mask.shape) == 2:
-            display_mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
-        else:
-            display_mask = mask
-
-        target_height = 400
-        mask_h, mask_w = display_mask.shape[:2]
-        mask_aspect = mask_w / mask_h
-        mask_display = cv2.resize(display_mask, (int(target_height * mask_aspect), target_height))
-
-        overlay_h, overlay_w = overlay.shape[:2]
-        overlay_aspect = overlay_w / overlay_h
-        overlay_display = cv2.resize(overlay, (int(target_height * overlay_aspect), target_height))
-        overlay_display = cv2.cvtColor(overlay_display, cv2.COLOR_BGR2RGB)
-
+        
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            st.image(
-                mask_display,
-                caption="Wound Segmentation Mask",
-                use_container_width=True,   # >>> changed to True
-                clamp=True,
-                output_format="PNG"
-            )
+            st.image(mask, caption="Wound Segmentation Mask", use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
-
+        
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            st.image(
-                overlay_display,
-                caption="Segmentation Overlay",
-                use_container_width=True,   # >>> changed to True
-                clamp=True,
-                output_format="PNG"
-            )
+            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Segmentation Overlay", use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
-
-        st.markdown('</div>', unsafe_allow_html=True)  # close equal-height-cols
-
-        st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;font-size:1.5rem;'>Wound Metrics</h3>", unsafe_allow_html=True)
-
+        
+        # Enhanced metrics display with custom styling
+        st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;'>Wound Metrics</h3>", unsafe_allow_html=True)
+        
         metric_col1, metric_col2 = st.columns(2)
-
+        
         with metric_col1:
             st.markdown(f"""
             <div class="metric-card">
@@ -274,15 +425,9 @@ if uploaded:
                 <div class="metric-label">Wound Area (pixels)</div>
             </div>
             """, unsafe_allow_html=True)
-
+            
         with metric_col2:
-            if len(mask.shape) == 3:
-                mask_gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
-                total_pixels = mask_gray.shape[0] * mask_gray.shape[1]
-            else:
-                total_pixels = mask.shape[0] * mask.shape[1]
-
-            pct = area / total_pixels * 100
+            pct = area/(mask.shape[0]*mask.shape[1])*100
             st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{pct:.2f}%</div>
@@ -293,4 +438,4 @@ if uploaded:
 
 # ──── Footer ───────────────────────────────────────────────────
 st.markdown(f"<div class='footer'>© 2025 Sugar Heal AI • Advanced Wound Analysis</div>", unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)  # close content-wrapper
+st.markdown('</div>', unsafe_allow_html=True)  # Close content-wrapper
