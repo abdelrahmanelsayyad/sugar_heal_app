@@ -595,7 +595,7 @@ if uploaded:
         st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
         
         # Enhanced metrics display with custom styling
-        st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;font-size:1.5rem;'>Wound Metrics</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align:center;margin-top:5px;margin-bottom:15px;font-size:1.5rem;'>Wound Metrics</h3>", unsafe_allow_html=True)
         
         metric_col1, metric_col2 = st.columns(2)
         
