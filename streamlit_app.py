@@ -151,6 +151,10 @@ st.markdown(f"""
     transition: all 0.3s ease;
     overflow: hidden;
     text-align: center;
+    height: 100%;  /* Ensure containers are same height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }}
   .img-container img {{ 
     max-height: 500px; 
@@ -263,6 +267,33 @@ st.markdown(f"""
     object-fit: contain;
   }}
   
+  /* Analysis Results Images - NEW */
+  .analysis-img {{
+    min-height: 350px;
+    max-height: 450px;
+    width: auto;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+  }}
+  
+  /* Equal Height Columns for Result Images */
+  .equal-height-cols .element-container {{
+    height: 100%;
+  }}
+  
+  .equal-height-cols [data-testid="column"] {{
+    display: flex;
+    flex-direction: column;
+  }}
+  
+  .equal-height-cols .stImage {{
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }}
+  
   /* Responsive breakpoints */
   /* Mobile Devices */
   @media screen and (max-width: 768px) {{
@@ -283,6 +314,7 @@ st.markdown(f"""
     .metric-label {{ font-size: 0.9rem; }}
     .results-header {{ font-size: 1.3rem; margin: 20px 0 10px; }}
     img.logo {{ max-width: 600px; }}
+    .analysis-img {{ min-height: 250px; max-height: 300px; }}
   }}
   
   /* Tablet Devices */
@@ -295,6 +327,7 @@ st.markdown(f"""
     }}
     figcaption p {{ font-size: 1.1rem !important; }}
     img.logo {{ max-width: 700px; }}
+    .analysis-img {{ min-height: 300px; max-height: 350px; }}
   }}
   
   /* Handle content width based on layout */
@@ -365,17 +398,32 @@ def preprocess(img_bgr: np.ndarray) -> np.ndarray:
 
 def predict_mask(img_bgr: np.ndarray) -> np.ndarray:
     prob = model.predict(preprocess(img_bgr), verbose=0)[0, ..., 0]
-    return (prob > THRESHOLD).astype("uint8") * 255
+    mask = (prob > THRESHOLD).astype("uint8") * 255
+    # Ensure mask is RGB (same dimensions as original) for consistent display
+    if len(mask.shape) == 2:
+        mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
+    return mask
 
 def make_overlay(orig_bgr, mask):
     h, w = orig_bgr.shape[:2]
-    mask_r = cv2.resize(mask, (w, h), cv2.INTER_NEAREST)
+    # Convert mask to single channel if it's RGB
+    if len(mask.shape) == 3:
+        mask_gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
+    else:
+        mask_gray = mask
+    
+    mask_r = cv2.resize(mask_gray, (w, h), cv2.INTER_NEAREST)
     overlay = orig_bgr.copy()
     overlay[mask_r==255] = (122,164,140)
     return cv2.addWeighted(overlay, ALPHA, orig_bgr, 1-ALPHA, 0)
 
 def calculate_wound_area(mask):
-    return int(np.sum(mask > 0))
+    # Handle both single-channel and RGB masks
+    if len(mask.shape) == 3:
+        mask_gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
+    else:
+        mask_gray = mask
+    return int(np.sum(mask_gray > 0))
 
 # ──── Instructions ─────────────────────────────────────────────
 st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
@@ -420,8 +468,8 @@ if uploaded:
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
-    # Remove the class_name parameter which is causing the error
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", 
+    # Use consistent parameters for image display
+    st.image(pil, caption="Uploaded Wound Image", use_column_width=False, output_format="PNG", 
              clamp=True, channels="RGB")
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -445,21 +493,45 @@ if uploaded:
         st.success("✅ Analysis complete!")
         st.markdown('<div class="results-header">Analysis Results</div>', unsafe_allow_html=True)
         
-        # Responsive results display - adjust based on screen size
+        # Add CSS class for equal height columns
+        st.markdown('<div class="equal-height-cols">', unsafe_allow_html=True)
+        
+        # Use consistent columns for results
         col1, col2 = st.columns(2)
+        
+        # Prepare mask for display (ensure it's RGB)
+        if len(mask.shape) == 2:
+            display_mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
+        else:
+            display_mask = mask
+            
+        # Ensure both images are resized to the same dimensions for display
+        target_height = 400  # Target height for both images
+        
+        # Calculate aspect ratio and resize
+        mask_h, mask_w = display_mask.shape[:2]
+        mask_aspect = mask_w / mask_h
+        mask_display = cv2.resize(display_mask, (int(target_height * mask_aspect), target_height))
+        
+        # Prepare overlay
+        overlay_h, overlay_w = overlay.shape[:2]
+        overlay_aspect = overlay_w / overlay_h
+        overlay_display = cv2.resize(overlay, (int(target_height * overlay_aspect), target_height))
+        overlay_display = cv2.cvtColor(overlay_display, cv2.COLOR_BGR2RGB)
         
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            # Remove class_name parameter here too
-            st.image(mask, caption="Wound Segmentation Mask", use_container_width=False)
+            st.image(mask_display, caption="Wound Segmentation Mask", 
+                    use_column_width=True, clamp=True, output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
-            # Remove class_name parameter here too
-            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Segmentation Overlay", 
-                    use_container_width=False)
+            st.image(overlay_display, caption="Segmentation Overlay", 
+                    use_column_width=True, clamp=True, output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
         
         # Enhanced metrics display with custom styling
         st.markdown("<h3 style='text-align:center;margin-top:20px;margin-bottom:15px;font-size:1.5rem;'>Wound Metrics</h3>", unsafe_allow_html=True)
@@ -475,7 +547,14 @@ if uploaded:
             """, unsafe_allow_html=True)
             
         with metric_col2:
-            pct = area/(mask.shape[0]*mask.shape[1])*100
+            # Use appropriate mask shape for calculation
+            if len(mask.shape) == 3:
+                mask_gray = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
+                total_pixels = mask_gray.shape[0] * mask_gray.shape[1]
+            else:
+                total_pixels = mask.shape[0] * mask.shape[1]
+                
+            pct = area/total_pixels*100
             st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{pct:.2f}%</div>
