@@ -14,6 +14,13 @@ import streamlit as st
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
+st.set_page_config(
+    page_title="Sugar Heal – Wound Analysis",
+    page_icon="🩹",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 # ──── Config ───────────────────────────────────────────────────
 MODEL_PATH = Path("unet_wound_segmentation_best.h5")
 MODEL_URL  = "https://drive.google.com/uc?id=1_PToBgQjEKAQAZ9ZX10sRpdgxQ18C-18"
@@ -50,12 +57,6 @@ COL = {
     "highlight"  : "rgb(122,164,140)",
 }
 
-st.set_page_config(
-    page_title="Sugar Heal – Wound Analysis",
-    page_icon="🩹",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
 
 st.markdown(f"""
 <style>
