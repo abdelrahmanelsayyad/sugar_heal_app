@@ -152,17 +152,18 @@ st.markdown(f"""
     overflow: hidden;
     text-align: center;
     height: 100%;  /* Ensure containers are same height */
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     justify-content: center;
-    align-items: center; /* Center horizontally */
+    align-items: center !important; /* Center horizontally */
+    width: 100% !important; /* Ensure full width */
   }}
   
   /* UPDATED: Make images larger and centered */
   .img-container img,
   .stImage img {{ 
     max-height: 650px !important; /* Increased from 500px */
-    max-width: 95% !important;
+    max-width: 100% !important;
     width: auto !important; 
     height: auto !important;
     margin: 0 auto !important; 
@@ -177,10 +178,11 @@ st.markdown(f"""
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    width: 100% !important;
   }}
   
   /* Override any Streamlit default styles that might affect centering */
-  .stImage > div {{
+  [data-testid="stImage"] > div {{
     display: flex !important;
     justify-content: center !important;
     width: 100% !important;
@@ -309,17 +311,19 @@ st.markdown(f"""
   }}
   
   .equal-height-cols [data-testid="column"] {{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
   }}
   
   .equal-height-cols .stImage {{
     flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
   }}
   
   /* Responsive breakpoints - UPDATED FOR LARGER IMAGES ON ALL DEVICES */
@@ -367,6 +371,25 @@ st.markdown(f"""
       font-size: 1.2rem !important;
     }}
     figcaption p {{ font-size: 1.2rem !important; }}
+    
+    /* Additional fixes for PC centering */
+    [data-testid="column"] {{
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }}
+    
+    [data-testid="stImage"] > div {{
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+    }}
+    
+    /* Extra specificity for PC image centering */
+    .stImage > div > img {{
+      margin: 0 auto !important;
+    }}
   }}
 </style>
 """, unsafe_allow_html=True)
@@ -496,8 +519,8 @@ if uploaded:
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
-    # UPDATED: Use consistent parameters for image display but with class for better control
-    st.image(pil, caption="Uploaded Wound Image", use_column_width=False, 
+    # UPDATED: Use consistent parameters for image display with fixed centering
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, 
              output_format="PNG", clamp=True, channels="RGB", width=None)
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -550,13 +573,13 @@ if uploaded:
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
             st.image(mask_display, caption="Wound Segmentation Mask", 
-                     use_column_width=False, clamp=True, output_format="PNG", width=None)
+                     use_container_width=False, clamp=True, output_format="PNG", width=None)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
             st.image(overlay_display, caption="Segmentation Overlay", 
-                     use_column_width=False, clamp=True, output_format="PNG", width=None)
+                     use_container_width=False, clamp=True, output_format="PNG", width=None)
             st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
