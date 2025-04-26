@@ -35,10 +35,8 @@ def download_model():
         try:
             import gdown
         except ImportError:
-            st.info("Installing gdown to fetch model...")
             os.system(f"{sys.executable} -m pip install gdown")
             import gdown
-        st.info("Downloading pre-trained model...")
         gdown.download(MODEL_URL, str(MODEL_PATH), quiet=False)
 
 # Ensure model is available
@@ -56,7 +54,6 @@ COL = {
     "text_light" : "#FFFFFF",
     "highlight"  : "rgb(122,164,140)",
 }
-
 
 st.markdown(f"""
 <style>
@@ -79,7 +76,7 @@ st.markdown(f"""
 
 # ──── Header ───────────────────────────────────────────────────
 if LOGO_PATH.exists():
-    st.image(str(LOGO_PATH), use_column_width=False, width=100)
+    st.image(str(LOGO_PATH), use_container_width=False, width=100)
 st.markdown("""
 <div class="header">
   <h1>Sugar Heal – Wound Analysis</h1>
@@ -170,7 +167,7 @@ if uploaded:
     pil = Image.open(uploaded).convert("RGB")
     orig_bgr = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
-    st.image(pil, caption="Uploaded Wound Image", use_column_width=False)
+    st.image(pil, caption="Uploaded Wound Image", use_container_width=False)
     st.markdown('</div>', unsafe_allow_html=True)
     if st.button("Analyze Wound"):
         progress = st.progress(0)
@@ -184,11 +181,11 @@ if uploaded:
         progress.empty()
         st.success("Analysis complete!")
         st.markdown(f"<h3 style='text-align:center;color:{COL['highlight']}'>Results</h3>", unsafe_allow_html=True)
-        r1,r2 = st.columns(2)
+        r1, r2 = st.columns(2)
         with r1:
-            st.image(mask, caption="Mask", clamp=True, use_column_width=True)
+            st.image(mask, caption="Mask", clamp=True, use_container_width=True)
         with r2:
-            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Overlay", use_column_width=True)
+            st.image(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), caption="Overlay", use_container_width=True)
         st.metric("Wound Area (px)", f"{area:,}")
         pct = area/(mask.shape[0]*mask.shape[1])*100
         st.metric("Coverage", f"{pct:.2f}%")
