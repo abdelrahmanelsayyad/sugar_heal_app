@@ -141,10 +141,10 @@ st.markdown(f"""
     background-color: rgba(59, 108, 83, 0.2);
   }}
   
-  /* Image Container */
+  /* Image Container - UPDATED FOR LARGER CENTERED IMAGES */
   .img-container {{ 
     background-color: {COL['dark']}; 
-    padding: 15px; 
+    padding: 20px; 
     border-radius: 12px; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
     margin-bottom: 25px; 
@@ -155,16 +155,35 @@ st.markdown(f"""
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center; /* Center horizontally */
   }}
-  .img-container img {{ 
-    max-height: 500px; 
-    max-width: 100%;
+  
+  /* UPDATED: Make images larger and centered */
+  .img-container img,
+  .stImage img {{ 
+    max-height: 650px !important; /* Increased from 500px */
+    max-width: 95% !important;
     width: auto !important; 
-    margin: 0 auto; 
-    display: block; 
-    border-radius: 6px;
+    height: auto !important;
+    margin: 0 auto !important; 
+    display: block !important; 
+    border-radius: 6px !important;
     transition: all 0.3s ease;
-    object-fit: contain;
+    object-fit: contain !important;
+  }}
+  
+  /* Center all Streamlit images */
+  [data-testid="stImage"] {{
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }}
+  
+  /* Override any Streamlit default styles that might affect centering */
+  .stImage > div {{
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
   }}
   
   /* Image Captions */
@@ -174,6 +193,7 @@ st.markdown(f"""
     margin-top: 12px !important;
     font-weight: 500 !important;
     text-align: center !important;
+    width: 100% !important;
   }}
   
   /* Style all Streamlit caption texts */
@@ -181,6 +201,7 @@ st.markdown(f"""
     font-size: 1.2rem !important;
     margin: 8px 0 !important;
     color: {COL['text_light']} !important;
+    text-align: center !important;
   }}
   
   /* Guidelines Box */
@@ -260,31 +281,37 @@ st.markdown(f"""
     font-size: 1rem; 
   }}
   
-  /* Custom Upload Image Size Control */
+  /* UPDATED: Custom Upload Image Size Control */
   .uploaded-image {{
-    max-height: 450px;
+    max-height: 650px !important; /* Increased from 450px */
     width: auto !important;
-    object-fit: contain;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    display: block !important;
   }}
   
-  /* Analysis Results Images - NEW */
+  /* UPDATED: Analysis Results Images */
   .analysis-img {{
-    min-height: 350px;
-    max-height: 450px;
-    width: auto;
-    object-fit: contain;
-    margin: 0 auto;
-    display: block;
+    min-height: 400px !important; /* Increased from 350px */
+    max-height: 650px !important; /* Increased from 450px */
+    width: auto !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    display: block !important;
   }}
   
-  /* Equal Height Columns for Result Images */
+  /* UPDATED: Equal Height Columns for Result Images */
   .equal-height-cols .element-container {{
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }}
   
   .equal-height-cols [data-testid="column"] {{
     display: flex;
     flex-direction: column;
+    align-items: center;
   }}
   
   .equal-height-cols .stImage {{
@@ -292,9 +319,10 @@ st.markdown(f"""
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
   }}
   
-  /* Responsive breakpoints */
+  /* Responsive breakpoints - UPDATED FOR LARGER IMAGES ON ALL DEVICES */
   /* Mobile Devices */
   @media screen and (max-width: 768px) {{
     .header {{ padding: 15px; }}
@@ -305,7 +333,7 @@ st.markdown(f"""
     .guidelines-box h4 {{ font-size: 1rem; }}
     .guidelines-box ul {{ font-size: 0.9rem; }}
     .stButton>button {{ padding: 10px 18px; font-size: 1rem; }}
-    .img-container img {{ max-height: 300px; }}
+    .img-container img, .stImage img {{ max-height: 450px !important; }} /* Increased from 300px */
     .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
       font-size: 0.9rem !important;
     }}
@@ -314,20 +342,20 @@ st.markdown(f"""
     .metric-label {{ font-size: 0.9rem; }}
     .results-header {{ font-size: 1.3rem; margin: 20px 0 10px; }}
     img.logo {{ max-width: 600px; }}
-    .analysis-img {{ min-height: 250px; max-height: 300px; }}
+    .analysis-img {{ min-height: 300px !important; max-height: 450px !important; }} /* Increased from 250/300px */
   }}
   
   /* Tablet Devices */
   @media screen and (min-width: 769px) and (max-width: 1024px) {{
     .header h1 {{ font-size: 1.8rem; }}
     .header p {{ font-size: 1rem; }}
-    .img-container img {{ max-height: 400px; }}
+    .img-container img, .stImage img {{ max-height: 550px !important; }} /* Increased from 400px */
     .img-container figcaption, .stImage figcaption, .css-1b0udgb, .css-83jbox {{
       font-size: 1.1rem !important;
     }}
     figcaption p {{ font-size: 1.1rem !important; }}
     img.logo {{ max-width: 700px; }}
-    .analysis-img {{ min-height: 300px; max-height: 350px; }}
+    .analysis-img {{ min-height: 350px !important; max-height: 550px !important; }} /* Increased from 300/350px */
   }}
   
   /* Handle content width based on layout */
@@ -468,9 +496,9 @@ if uploaded:
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
-    # Use consistent parameters for image display
-    st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", 
-             clamp=True, channels="RGB")
+    # UPDATED: Use consistent parameters for image display but with class for better control
+    st.image(pil, caption="Uploaded Wound Image", use_column_width=False, 
+             output_format="PNG", clamp=True, channels="RGB", width=None)
     
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -505,8 +533,8 @@ if uploaded:
         else:
             display_mask = mask
              
-        # Ensure both images are resized to the same dimensions for display
-        target_height = 400  # Target height for both images
+        # UPDATED: Use higher target height for better visibility
+        target_height = 550  # Increased from 400
         
         # Calculate aspect ratio and resize
         mask_h, mask_w = display_mask.shape[:2]
@@ -522,13 +550,13 @@ if uploaded:
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
             st.image(mask_display, caption="Wound Segmentation Mask", 
-                     use_container_width=False, clamp=True, output_format="PNG")
+                     use_column_width=False, clamp=True, output_format="PNG", width=None)
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
             st.image(overlay_display, caption="Segmentation Overlay", 
-                     use_container_width=False, clamp=True, output_format="PNG")
+                     use_column_width=False, clamp=True, output_format="PNG", width=None)
             st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
