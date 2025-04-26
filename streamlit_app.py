@@ -468,7 +468,7 @@ if uploaded:
     st.markdown('<div class="section-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="img-container">', unsafe_allow_html=True)
     
-    # Use consistent parameters for image display
+    # Changed from use_column_width=True to use_container_width=False
     st.image(pil, caption="Uploaded Wound Image", use_container_width=False, output_format="PNG", 
              clamp=True, channels="RGB")
     
@@ -504,7 +504,7 @@ if uploaded:
             display_mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
         else:
             display_mask = mask
-             
+            
         # Ensure both images are resized to the same dimensions for display
         target_height = 400  # Target height for both images
         
@@ -521,14 +521,16 @@ if uploaded:
         
         with col1:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
+            # Changed from use_column_width=True to use_container_width=False
             st.image(mask_display, caption="Wound Segmentation Mask", 
-                     use_container_width=False, clamp=True, output_format="PNG")
+                    use_container_width=False, clamp=True, output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
             st.markdown('<div class="img-container">', unsafe_allow_html=True)
+            # Changed from use_column_width=True to use_container_width=False
             st.image(overlay_display, caption="Segmentation Overlay", 
-                     use_container_width=False, clamp=True, output_format="PNG")
+                    use_container_width=False, clamp=True, output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True) # Close equal-height-cols
